@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #b6e8f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fccce8;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 500px;
+            height:300px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hint {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .remaining-guesses {
+            font-size: 18px;
+            margin-top: 10px;
+            color: #ff3333;
+        }
+        .play-again {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Number Guessing Game</h1>
+    <p>Guess the number between 1 and 100</p>
+    <input type="number" id="userGuess" min="1" max="100">
+    <button onclick="makeGuess()">Submit Guess</button>
+    <p class="hint" id="hintMessage"></p>
+    <p class="remaining-guesses" id="remainingGuesses"></p>
+    <button class="play-again" onclick="startNewGame()">Play Again</button>
+</div>
+
+<script>
+    let secretNumber;
+    let remainingGuesses;
+    let guessedNumbers = [];
+
+    function startNewGame() {
+        secretNumber = getRandomNumber();
+        remainingGuesses = 10;
+        guessedNumbers = [];
+        document.getElementById('remainingGuesses').textContent = `Guesses left: ${remainingGuesses}`;
+        document.getElementById('hintMessage').textContent = '';
+        document.getElementById('userGuess').value = '';
+        document.getElementById('userGuess').disabled = false;
+        document.getElementById('play-again').style.display = 'none';
+    }
+
+    function getRandomNumber() {
+        return Math.floor(Math.random() * 100) + 1;
+    }
+
+    function giveHint(number, guess) {
+        if (guess > (number + 10) || guess < (number - 10)) {
+            return `The entered number is ${guess}. \nThe difference between the guessed number and hidden number is greater than 10.`;
+        } else if (number === guess) {
+            return "Right! You guessed the number!";
+        } else {
+            return `The entered number is ${guess}. \nSo close!! The difference between the guessed number and hidden number is less than 10.`;
+        }
+    }
+
+    function makeGuess() {
+        const userGuess = parseInt(document.getElementById('userGuess').value);
+        const hintMessage = document.getElementById('hintMessage');
+        const remainingGuessesMessage = document.getElementById('remainingGuesses');
+        const playAgainButton = document.querySelector('.play-again');
+
+        if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+            hintMessage.textContent = "Please enter a valid number between 1 and 100.";
+            return;
+        }
+
+        const hint = giveHint(secretNumber, userGuess);
+        hintMessage.textContent = hint;
+
+        guessedNumbers.push(userGuess);
+
+        remainingGuesses--;
+
+        remainingGuessesMessage.textContent = `Guesses left: ${remainingGuesses}`;
+
+        if (remainingGuesses <= 0 || secretNumber === userGuess) {
+            document.getElementById('userGuess').disabled = true;
+            playAgainButton.style.display = 'inline-block';
+        }
+
+        if (remainingGuesses <= 0) {
+            remainingGuessesMessage.textContent = `Game Over! The correct number was ${secretNumber}.`;
+        }
+
+        if (secretNumber === userGuess) {
+            hintMessage.textContent = "Right! You guessed the number!";
+        }
+
+        document.getElementById('userGuess').value = '';
+    }
+
+    document.getElementById('userGuess').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            makeGuess();
+        }
+    });
+
+    startNewGame();
+</script>
+
+</body>
+</html>
